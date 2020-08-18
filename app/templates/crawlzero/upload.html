@@ -1,0 +1,14 @@
+{% extends "crawlzero/base.html" %}
+{% block body_block %}
+<div class="container">
+  <div class="jumbotron">
+    <h1>Upload your file here...</h1>
+    <form method="post" enctype="multipart/form-data" action="{% url 'crawlzero:upload_file' %}">
+      {% csrf_token %}
+      <label for="file">File:</label>
+      <input type="file" name="file">
+      <input type="submit" value="Upload">
+    </form>
+  </div>
+</div>
+{% endblock %}

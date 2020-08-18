@@ -1,0 +1,18 @@
+{
+ "AWSEBDockerrunVersion": "1",
+ "Image": {
+   "Name": "rputh055/crawlzero:latest",
+   "Update": "true"
+ },
+ "Ports": [
+   {
+     "ContainerPort": "8000"
+   }
+ ],
+ "Volumes": [
+  {
+    "HostDirectory": "/srv",
+    "ContainerDirectory": "/srv"
+  }
+]
+}

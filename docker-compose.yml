@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    hostname: db
+    env_file:
+      - config/db/database1_env
+    volumes:
+      - database1_volume:/var/lib/postgresql/data
+  app:
+    build:
+      context: .
+      dockerfile: config/app/Dockerfile
+    command: sh /config/on-container-start.sh
+    hostname: app
+    volumes:
+      - ./app:/app
+      - static:/srv/static
+      - media:/srv/media
+    expose:
+      - "8000"
+    depends_on:
+      - db
+    environment:
+      - DJANGO_SETTINGS_MODULE=myproject.settings
+  nginx:
+    image: nginx:latest
+    hostname: nginx
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./config/nginx:/etc/nginx/conf.d
+      - static:/srv/static
+      - media:/srv/media
+    depends_on:
+      - app
+
+volumes:
+  static:
+  media:
+  database1_volume:
