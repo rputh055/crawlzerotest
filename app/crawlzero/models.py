@@ -10,7 +10,9 @@ from django.dispatch import receiver
 def user_directory_path(instance, filename):
     ext = filename.split('.')[-1]
     filename = '{}.{}'.format(uuid.uuid4().hex[:10], ext)
+    #return os.path.join(str(instance.id), filename)
     return os.path.join(str(instance.id), filename)
+    
 
 class File(models.Model):
     #owner = models.OneToOneField  (User, on_delete=models.CASCADE)
