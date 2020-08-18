@@ -2,12 +2,15 @@ version: '3'
 
 services:
   db:
-    image: postgres
+    image: postgres:10
     hostname: db
     env_file:
       - config/db/database1_env
     volumes:
       - database1_volume:/var/lib/postgresql/data
+    networks:
+      - database1_network
+    
   app:
     build:
       context: .
@@ -18,14 +21,19 @@ services:
       - ./app:/app
       - static:/srv/static
       - media:/srv/media
+    networks:
+      - nginx_network
+      - database1_network
     expose:
       - "8000"
     depends_on:
       - db
+    links:
+      - db:db
     environment:
       - DJANGO_SETTINGS_MODULE=myproject.settings
   nginx:
-    image: nginx:latest
+    image: nginx:1.13
     hostname: nginx
     ports:
       - "8000:8000"
@@ -35,8 +43,17 @@ services:
       - media:/srv/media
     depends_on:
       - app
+    networks:
+      - nginx_network
+
+
+networks:
+  nginx_network:
+    driver: bridge
+  database1_network:
+    driver: bridge
 
 volumes:
+  database1_volume:
   static:
   media:
-  database1_volume:
