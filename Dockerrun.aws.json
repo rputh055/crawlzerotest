@@ -1,114 +1,17 @@
 {
-    "AWSEBDockerrunVersion": "2",
-    "containerDefinitions": [
-        {
-            "command": [
-                "sh",
-                "/config/on-container-start.sh"
-            ],
-            "environment": [
-                {
-                    "name": "DJANGO_SETTINGS_MODULE",
-                    "value": "myproject.settings"
-                }
-            ],
-            "essential": true,
-            
-            "image": "rputh055/crawlzero:latest",
-           
-            "links": [
-                "db:db"
-            ],
-            "mountPoints": [
-                {
-                    "containerPath": "/app",
-                    "sourceVolume": "_App"
-                },
-                {
-                    "containerPath": "/srv/static",
-                    "sourceVolume": "Static"
-                },
-                {
-                    "containerPath": "/srv/media",
-                    "sourceVolume": "Media"
-                }
-            ],
-            "name": "app"
-        },
-        {
-            "essential": true,
-            "image": "postgres:latest",
-            "mountPoints": [
-                {
-                    "containerPath": "/var/lib/postgresql/data",
-                    "sourceVolume": "Database1_Volume"
-                }
-            ],
-            "name": "db",
-            "portMappings": [
-                {
-                    "containerPort": 5432,
-                    "hostPort": 8001
-                }
-            ]
-        },
-        {
-            "essential": true,
-            "image": "nginx:latest",
-            "mountPoints": [
-                {
-                    "containerPath": "/etc/nginx/conf.d",
-                    "sourceVolume": "_ConfigNginx"
-                },
-                {
-                    "containerPath": "/srv/static",
-                    "sourceVolume": "Static"
-                },
-                {
-                    "containerPath": "/srv/media",
-                    "sourceVolume": "Media"
-                }
-            ],
-            "name": "nginx",
-            "portMappings": [
-                {
-                    "containerPort": 8000,
-                    "hostPort": 8000
-                }
-            ]
-        }
-    ],
-    "family": "",
-    "volumes": [
-        {
-            "host": {
-                "sourcePath": "database1_volume"
-            },
-            "name": "Database1_Volume"
-        },
-        {
-            "host": {
-                "sourcePath": "./app"
-            },
-            "name": "_App"
-        },
-        {
-            "host": {
-                "sourcePath": "static"
-            },
-            "name": "Static"
-        },
-        {
-            "host": {
-                "sourcePath": "media"
-            },
-            "name": "Media"
-        },
-        {
-            "host": {
-                "sourcePath": "./config/nginx"
-            },
-            "name": "_ConfigNginx"
-        }
-    ]
-}
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": "rputh055/crawlzero:latest",
+    "Update": "true"
+  },
+  "Ports": [
+    {
+      "ContainerPort": "8000"
+    }
+  ],
+  "Volumes": [
+   {
+     "HostDirectory": "/srv",
+     "ContainerDirectory": "/srv"
+   }
+ ]
