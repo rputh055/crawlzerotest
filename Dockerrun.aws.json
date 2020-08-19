@@ -1,7 +1,8 @@
 {
+    "AWSEBDockerrunVersion": "1",
     "containerDefinitions": [
         {
-            "AWSEBDockerrunVersion": "1",
+            
             "command": [
                 "sh",
                 "/config/on-container-start.sh"
