@@ -13,15 +13,9 @@
                 }
             ],
             "essential": true,
-            "Image": {
-              "Name": "rputh055/crawlzero:latest",
-              "Update": "true"
-            },
-            "Ports": [
-              {
-                "ContainerPort": "8000"
-              }
-            ],
+            
+            "image": "rputh055/crawlzero:latest",
+           
             "links": [
                 "db:db"
             ],
