@@ -2,7 +2,6 @@
     "AWSEBDockerrunVersion": "1",
     "containerDefinitions": [
         {
-            
             "command": [
                 "sh",
                 "/config/on-container-start.sh"
@@ -51,7 +50,13 @@
                     "sourceVolume": "Database1_Volume"
                 }
             ],
-            "name": "db"
+            "name": "db",
+            "portMappings": [
+                {
+                    "containerPort": 5432,
+                    "hostPort": 8001
+                }
+            ]
         },
         {
             "essential": true,
