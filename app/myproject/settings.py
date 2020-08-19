@@ -85,14 +85,25 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 #     }
 # }
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'database1',
+#         'USER': 'database1',
+#         'PASSWORD': 'RajeshRockey',
+#         'HOST': 'database1.c0zsiqjatci5.ca-central-1.rds.amazonaws.com',
+#         'PORT': '5432',
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'database1',
-        'USER': 'database1',
-        'PASSWORD': 'RajeshRockey',
-        'HOST': 'database1.c0zsiqjatci5.ca-central-1.rds.amazonaws.com',
-        'PORT': '5432',
+        'NAME': os.environ.get('DJANGO_DB_NAME'),
+        'USER': os.environ.get('DJANGO_DB_USER'),
+        'PASSWORD': os.environ.get('DJANGO_DB_PASS'),
+        'HOST': os.environ.get('DJANGO_DB_HOST'),
+        'PORT': os.getenv('DJANGO_DB_PORT', 5432),
     }
 }
 
