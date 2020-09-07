@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+from celery.schedules import crontab
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'crawlzero',
+    'django_celery_beat',
+    'django_celery_results',
 
 ]
 
@@ -142,3 +145,13 @@ MEDIA_ROOT = os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)), 'media')
 
 
 LOGIN_URL = '/crawlzero/user_login/'
+
+# Celery config
+CELERY_BROKER_URL= 'pyamqp://rabbitmq:5672'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_BEAT_SCHEDULE = {
+    'queue_every_five_mins': {
+        'task': 'myproject.tasks.query_every_five_mins',
+        'schedule': crontab(minute=5),
+    },
+}

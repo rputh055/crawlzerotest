@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 import uuid
 from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
+ 
 
 # Create your models here.
 
@@ -18,9 +19,11 @@ class File(models.Model):
     #owner = models.OneToOneField  (User, on_delete=models.CASCADE)
     file = models.FileField(upload_to=user_directory_path)
 
+
+
 def __str__(self):
   return self.user.username
-
+"""
 @receiver(models.signals.post_delete, sender=File)
 def auto_delete_file_on_delete(sender, instance, **kwargs):
     if instance.file:
@@ -39,3 +42,4 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
         if os.path.isfile(old_file.path):
             os.remove(old_file.path)
 
+"""

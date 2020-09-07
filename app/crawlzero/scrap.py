@@ -7,9 +7,12 @@ import csv
 import pandas as pd
 from chromedriver_py import binary_path
 from selenium.webdriver.chrome.options import Options
+from .mailing import mail,mailfail
+from myproject.celery_app import app as celery_app
+from celery import Task
+from django.core.files.storage import default_storage
 
-
-class Scraper(object):
+class Scraper(Task):
     #def __init__(self):
         #self.path = path
 
@@ -33,6 +36,7 @@ class Scraper(object):
         chrome_options.add_argument('--data-path=/tmp/data-path')
         chrome_options.add_argument('--ignore-certificate-errors')
         chrome_options.add_argument('--homedir=/tmp')
+        chrome_options.add_argument('--disable-dev-shm-usage')        
         chrome_options.add_argument('--disk-cache-dir=/tmp/cache-dir')
         chrome_options.add_argument('user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36')
         driver = webdriver.Chrome(executable_path = binary_path,options=chrome_options)
@@ -71,22 +75,33 @@ class Scraper(object):
             return self.price_match(s)
 
 
-    def parser(self, file):
-        infile = pd.read_excel(file)
-        
-        infile["Validity"] = ""
+    # def run(self, file, receiveraddr):
+    #     try:
+    #         with open(default_storage.open(os.path.join(file), 'r')) as f:
+    #             infile = pd.read_excel(f)
+            
+    #         infile["Validity"] = ""
 
-        for i in range(len(infile['link'])):
-            actual = self.price_match(str(infile['price'][i]))
-            predicted = self.extract(str(infile['link'][i]))
-            #result(actual,predicted, i)
-            if(actual == predicted):
-                infile['Validity'][i] = "Valid"
-            else:
-                infile['Validity'][i] = "InValid" + predicted
+    #         for i in range(len(infile['link'])):
+    #             actual = self.price_match(str(infile['price'][i]))
+    #             predicted = self.extract(str(infile['link'][i]))
+    #             #result(actual,predicted, i)
+    #             if(actual == predicted):
+    #                 infile['Validity'][i] = "Valid"
+    #             else:
+    #                 infile['Validity'][i] = "InValid" + predicted
 
 
-        #pathing = os.path.join(infile)
-        outfile = infile.to_csv()
-        return outfile
-        #os.remove(pathing)
+    #         #pathing = os.path.join(infile)
+    #         outfile = infile.to_csv()
+    #         mail(receiveraddr, outfile)
+    #     # return outfile
+    #     #os.remove(pathing)
+    #     except Exception as e:
+    #         mailfail(receiveraddr, str(e))
+
+    def run(self, receiveraddr):
+         mailfail("rajagadamsetty@gmail.com", "t5esting cle")
+
+
+

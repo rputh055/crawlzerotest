@@ -8,10 +8,15 @@ from django.views.decorators.cache import cache_control
 from django.contrib import messages
 import os
 from .models import File
+from django.core.files.storage import default_storage, FileSystemStorage
 from .scrap import Scraper
+from .mailing import mail,mailfail
+import json
+from .scrmail import scrapmail
+# from .serializer import FileUploadSerializer
 
 # Create your views here.
-scraper_obj = Scraper()
+# task = Scraper()
 
 def index(request):
     return render(request,'crawlzero/index.html')
@@ -67,21 +72,24 @@ def user_login(request):
 @login_required
 def upload_file(request):
     if request.method == 'POST':
-        form = FileUploadModelForm(request.POST, request.FILES)
-        if form.is_valid():
-            infile = form.save(commit=False)
-            infile.user = request.user
-            infile.save()
-            outfile = scraper_obj.parser(request.FILES['file'])
-            infile.delete()
-            response = HttpResponse(outfile, content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = 'attachment; filename="updated.xls"'
-            return response
-            #return render(request, 'crawlzero/login.html', {})
-        else:
-            return HttpResponse('Upload a csv or excel file')
+        upload_file = request.FILES['file']
+        fs = FileSystemStorage()
+        name = fs.save(upload_file.name, upload_file)
+        
+
+        scrapmail.delay(name, request.user.email)
+        # infile.delete()
+        # response = HttpResponse(outfile, content_type='application/vnd.ms-excel')
+        # response['Content-Disposition'] = 'attachment; filename="updated.xls"'
+        return HttpResponse("A mail will be sent after processing is done")
+        # return response
+        # return render(request, 'crawlzero/login.html', {})
+    # else:
+    #     return HttpResponse('Upload a csv or excel file')
     else:
         form = FileUploadModelForm()
+        # serializer = FileUploadSerializer()
 
         
+    # return render(request, 'crawlzero/upload.html', {'form': form})
     return render(request, 'crawlzero/upload.html', {'form': form})

@@ -29,6 +29,7 @@ ADD config/app /config/
 
 # Installing all python dependencies
 RUN pip install -r /config/requirements.txt
+RUN mv /config/wait-for /bin/wait-for
 
 # Open port 8000 to outside world
 EXPOSE 8000
@@ -42,3 +43,5 @@ CMD ["sh", "/config/on-container-start.sh"]
 RUN mkdir /app
 WORKDIR /app
 ADD app /app/
+
+

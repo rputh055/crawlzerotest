@@ -1,6 +1,16 @@
 version: '3'
 
 services:
+  rabbitmq:
+    container_name: rabbitmq
+    hostname: rabbitmq
+    image: rabbitmq:latest
+    networks:
+      - main
+    ports:
+      - "5672:5672"
+    restart: on-failure
+
   db:
     image: postgres:latest
     hostname: db
@@ -9,7 +19,9 @@ services:
     volumes:
       - database1_volume:/var/lib/postgresql/data
     networks:
-      - database1_network
+      - main
+    ports:
+      - "5432:5432"
     
   app:
     build:
@@ -22,16 +34,17 @@ services:
       - static:/srv/static
       - media:/srv/media
     networks:
-      - nginx_network
-      - database1_network
+      - main
+    image: crawlzero
     expose:
       - "8000"
     depends_on:
       - db
+      - rabbitmq
     links:
       - db:db
     environment:
-      - DJANGO_SETTINGS_MODULE=myproject.settings
+      - DJANGO_SETTINGS_MODULE=myproject.settings_dev
   nginx:
     image: nginx:latest
     hostname: nginx
@@ -44,14 +57,49 @@ services:
     depends_on:
       - app
     networks:
-      - nginx_network
+      - main
+
+  celery_worker:
+    command: sh -c "celery -A myproject worker -l info"
+    container_name: celery_worker
+    depends_on:
+      - app
+      - db
+      - rabbitmq
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+    hostname: celery_worker
+    image: crawlzero
+    networks:
+      - main
+    restart: on-failure
+
+  celery_beat:
+    command: sh -c "celery -A myproject beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler"
+    container_name: celery_beat
+    depends_on:
+      - app
+      - db
+      - rabbitmq
+    hostname: celery_beat
+    image: crawlzero
+    networks:
+      - main
+    restart: on-failure
 
 
-networks:
-  nginx_network:
-    driver: bridge
-  database1_network:
-    driver: bridge
+
+networks: 
+  main:
 
 volumes:
   database1_volume:

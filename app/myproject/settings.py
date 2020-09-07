@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+from celery.schedules import crontab
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'crawlzero',
+    'django_celery_beat',
+    'django_celery_results',
 
 ]
 
@@ -85,28 +89,30 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 #     }
 # }
 
+#change me
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'database1',
-#         'USER': 'database1',
-#         'PASSWORD': 'RajeshRockey',
-#         'HOST': 'database1.c0zsiqjatci5.ca-central-1.rds.amazonaws.com',
-#         'PORT': '5432',
+#         'NAME': os.environ.get('DJANGO_DB_NAME'),
+#         'USER': os.environ.get('DJANGO_DB_USER'),
+#         'PASSWORD': os.environ.get('DJANGO_DB_PASS'),
+#         'HOST': os.environ.get('DJANGO_DB_HOST'),
+#         'PORT': os.getenv('DJANGO_DB_PORT', 5432),
 #     }
 # }
+
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get('DJANGO_DB_NAME'),
-        'USER': os.environ.get('DJANGO_DB_USER'),
-        'PASSWORD': os.environ.get('DJANGO_DB_PASS'),
-        'HOST': os.environ.get('DJANGO_DB_HOST'),
-        'PORT': os.getenv('DJANGO_DB_PORT', 5432),
+        'NAME': 'database1',
+        'USER': 'database1',
+        'PASSWORD': 'RajeshRockey',
+        'HOST': 'db',
+        'PORT': 5432,
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -160,3 +166,13 @@ MEDIA_ROOT = os.path.join(os.path.dirname(os.path.dirname(BASE_DIR)), 'media')
 
 
 LOGIN_URL = '/crawlzero/user_login/'
+
+# Celery config
+CELERY_BROKER_URL= 'pyamqp://rabbitmq:5672'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_BEAT_SCHEDULE = {
+    'queue_every_five_mins': {
+        'task': 'myproject.tasks.query_every_five_mins',
+        'schedule': crontab(minute=5),
+    },
+}
